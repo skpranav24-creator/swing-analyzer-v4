@@ -115,15 +115,25 @@ def owned_decision(score,r):
     return "🟡 HOLD WITH CAUTION"
 
 def analyze(symbol):
-    ticker=symbol.strip().upper()
-    if not ticker.endswith(".NS"): ticker += ".NS"
-    raw=get_data(ticker)
-   if len(raw) < 200:
-    raise ValueError(f"Not enough historical data — received only {len(raw)} rows")
-    df=enrich(raw); r=df.iloc[-1]; score,reasons=score_row(r)
-    price=float(r.Close); atr=float(r.ATR)
-    stop=max(0.01,price-1.5*atr); risk=max(price-stop,0.01)
-    return ticker,df,r,score,reasons,price,stop,price+2*risk,price+3*risk
+    ticker = symbol.strip().upper()
+    if not ticker.endswith(".NS"):
+        ticker += ".NS"
+
+    raw = get_data(ticker)
+
+    if len(raw) < 200:
+        raise ValueError(f"Not enough historical data — received only {len(raw)} rows")
+
+    df = enrich(raw)
+    r = df.iloc[-1]
+    score, reasons = score_row(r)
+
+    price = float(r.Close)
+    atr = float(r.ATR)
+    stop = max(0.01, price - 1.5 * atr)
+    risk = max(price - stop, 0.01)
+
+    return ticker, df, r, score, reasons, price, stop, price + 2 * risk, price + 3 * risk
 
 st.sidebar.header("Trade setup")
 symbol=st.sidebar.text_input("NSE symbol","SILVERBEES").strip().upper()
