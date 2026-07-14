@@ -40,8 +40,15 @@ def send_telegram(message):
         return False, str(e)
 
 @st.cache_data(ttl=60)
-def get_data(t, period="2y"):
-    d = yf.download(t, period=period, interval="1d", auto_adjust=False, progress=False)
+def get_data(t, period="5y"):
+    d = yf.download(
+        t,
+        period=period,
+        interval="1d",
+        auto_adjust=False,
+        progress=False,
+        threads=False
+    )
     if isinstance(d.columns, pd.MultiIndex):
         d.columns = d.columns.get_level_values(0)
     return d[["Open","High","Low","Close","Volume"]].dropna()
@@ -111,7 +118,8 @@ def analyze(symbol):
     ticker=symbol.strip().upper()
     if not ticker.endswith(".NS"): ticker += ".NS"
     raw=get_data(ticker)
-    if len(raw)<220: raise ValueError("Not enough historical data")
+   if len(raw) < 200:
+    raise ValueError(f"Not enough historical data — received only {len(raw)} rows")
     df=enrich(raw); r=df.iloc[-1]; score,reasons=score_row(r)
     price=float(r.Close); atr=float(r.ATR)
     stop=max(0.01,price-1.5*atr); risk=max(price-stop,0.01)
