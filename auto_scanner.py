@@ -10,12 +10,12 @@ from datetime import datetime
 WATCHLIST = ["SILVERBEES", "GOLDBEES", "TMPV"]
 STATE_FILE = "signal_state.json"
 
-# Load Telegram secrets
-with open(".streamlit/secrets.toml", "rb") as f:
-    secrets = tomllib.load(f)
+# Load Telegram credentials from GitHub Actions environment variables
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-TELEGRAM_BOT_TOKEN = secrets["TELEGRAM_BOT_TOKEN"]
-TELEGRAM_CHAT_ID = str(secrets["TELEGRAM_CHAT_ID"])
+if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+    raise RuntimeError("Telegram credentials are not configured.")
 
 
 def send_telegram(message):
